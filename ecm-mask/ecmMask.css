@@ -1,0 +1,33 @@
+/* ECM 문서 마스킹 — 레이아웃/동작 필수 CSS (삭제 금지)
+ * 모든 선택자는 .emk 하위로 한정되어 기존 화면 CSS 와 충돌하지 않음.
+ * 높이: 부모에 높이가 정해져 있으면 100% 를 채우고, 아니면 --emk-h 값을 사용 (기본 calc(100vh - 24px)) */
+.emk{--emk-h:calc(100vh - 24px);box-sizing:border-box}
+.emk *,.emk *::before,.emk *::after{box-sizing:border-box}
+.emk-wrap{display:flex;gap:12px;padding:12px;height:var(--emk-h);min-height:560px}
+.emk .emk-pane{display:flex;flex-direction:column;min-width:0}
+.emk .emk-left{flex:1 1 52%}.emk .emk-right{flex:1 1 48%}
+.emk .emk-body{padding:12px;overflow:auto;flex:1;min-height:0;display:flex;flex-direction:column;gap:10px}
+.emk .emk-filters{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+.emk .emk-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.emk .emk-sp{flex:1}
+.emk .emk-sum{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.emk .emk-bar{height:6px;flex:1;min-width:80px;overflow:hidden}
+.emk .emk-bar i{display:block;height:100%;width:0}
+.emk .emk-tbl{overflow:auto;flex:1;min-height:120px}
+.emk .emk-tbl table{white-space:nowrap;margin:0;width:100%}
+.emk .emk-tbl th{position:sticky;top:0;z-index:1}
+.emk .emk-tbl td.emk-l{text-align:left}
+.emk .emk-tbl tbody tr{cursor:pointer}
+.emk .emk-pg{display:flex;gap:4px;align-items:center;flex-wrap:wrap}
+.emk .emk-vwrap{flex:1;min-height:200px;overflow:auto;position:relative}
+.emk .emk-empty{position:absolute;top:0;right:0;bottom:0;left:0;display:flex;align-items:center;justify-content:center}
+.emk .emk-cv{display:block;margin:0 auto;cursor:crosshair;touch-action:none}
+.emk .emk-pdf{width:100%;height:100%;border:0;display:none}
+.emk .emk-modal{position:fixed;top:0;right:0;bottom:0;left:0;display:none;align-items:center;justify-content:center;z-index:2000}
+.emk .emk-modal.emk-on{display:flex}
+.emk .emk-dlg{width:min(760px,94vw);max-height:92vh;display:flex;flex-direction:column}
+.emk .emk-mb{overflow:auto;flex:1}
+.emk .emk-mf{display:flex;gap:8px;justify-content:flex-end}
+.emk .emk-dlg canvas{max-width:100%;display:block}
+.emk .emk-toast{position:fixed;right:20px;bottom:20px;display:none;z-index:2010}
+@media(max-width:900px){.emk-wrap{flex-direction:column;height:auto}.emk .emk-pane{min-height:520px}}

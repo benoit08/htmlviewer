@@ -1,0 +1,7 @@
+# 라이선스 대상 고객사 전용 라이브러리 — 저장소 · 산출물에 포함 금지 (테스트용 로컬 보관만)
+*.jar
+!**/.mvn/wrapper/maven-wrapper.jar
+
+# 샘플 실행 데이터 / 빌드 결과
+sample/data/
+sample/target/

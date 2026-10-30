@@ -1,0 +1,43 @@
+/* ECM 문서 마스킹 — 기본 외관 (선택).
+ * 사내 CSS(Bootstrap 계열)를 입힐 때는 이 파일의 <link> 만 제거하면 됨. 레이아웃은 ecmMask.css 가 유지.
+ * 마크업에는 Bootstrap 4/5 공용 클래스(btn, btn-primary, form-control, table, badge …)가 이미 붙어 있음. */
+.emk{--pri:#3d5fd6;--bd:#dfe3ea;--bg:#f4f6fb;--mut:#7a8294;--ok:#2b9348;--warn:#e8590c;--red:#e03131;
+  font:13px/1.4 "Malgun Gothic",Arial,sans-serif;color:#333}
+.emk .emk-pane{border:1px solid var(--bd);border-radius:6px;background:#fff}
+.emk .emk-pane h3{margin:0;padding:10px 14px;font-size:15px;border-bottom:1px solid var(--bd);background:var(--bg)}
+.emk .emk-filters label{font-size:11px;color:var(--mut);display:block;margin-bottom:2px}
+.emk .form-control{width:100%;height:30px;border:1px solid var(--bd);border-radius:4px;padding:0 6px;font:inherit;background:#fff}
+.emk .btn{height:30px;border:1px solid var(--bd);border-radius:4px;padding:0 12px;font:inherit;cursor:pointer}
+.emk .btn:disabled{opacity:.45;cursor:not-allowed}
+.emk .btn-secondary,.emk .btn-light{background:#fff;color:#333}
+.emk .btn-primary{background:var(--pri);border-color:var(--pri);color:#fff}
+.emk .btn-outline-danger{background:#fff;color:var(--red)}
+.emk .emk-pg .btn{min-width:30px;padding:0 6px}
+.emk .emk-chip{padding:3px 10px;border-radius:12px;background:var(--bg);border:1px solid var(--bd);font-size:12px}
+.emk .emk-chip b{margin-left:4px}.emk .emk-chip.emk-ok b{color:var(--ok)}.emk .emk-chip.emk-warn b{color:var(--warn)}
+.emk .emk-bar{background:var(--bd);border-radius:3px}.emk .emk-bar i{background:var(--ok)}
+.emk .emk-tbl{border:1px solid var(--bd)}
+.emk .table{border-collapse:collapse}
+.emk .table th,.emk .table td{padding:7px 8px;border-bottom:1px solid var(--bd);text-align:center}
+.emk .table th{background:var(--bg);font-weight:600}
+.emk .table tbody tr:nth-child(even){background:#fafbfd}
+.emk .table tbody tr:hover{background:#eef2ff}
+.emk .table tbody tr.emk-sel{background:#dbe4ff}
+.emk .badge{padding:2px 8px;border-radius:10px;font-size:11px;color:#fff}
+.emk .badge-secondary{background:#adb5bd}.emk .badge-success{background:var(--ok)}.emk .badge-warning{background:var(--warn)}
+.emk .emk-mut{color:var(--mut)}
+.emk .emk-help{font-size:11.5px}
+.emk .emk-info{background:#e7f5ff;color:#1c5d99;padding:8px 12px;border-radius:4px}
+.emk .emk-info.emk-ok{background:#ebfbee;color:#2b8a3e}
+.emk .emk-info.emk-err{background:#fff5f5;color:var(--red)}
+.emk .emk-vwrap{border:1px dashed var(--bd);background:#e9ecef}
+.emk .emk-empty{color:var(--mut)}
+.emk .emk-cv,.emk .emk-pdf{background:#fff}
+.emk .emk-modal{background:rgba(0,0,0,.5)}
+.emk .emk-dlg{background:#fff;border-radius:8px}
+.emk .emk-dlg h4{margin:0;padding:14px 18px;border-bottom:1px solid var(--bd);font-size:16px}
+.emk .emk-mb{padding:14px 18px}
+.emk .emk-mf{padding:12px 18px;border-top:1px solid var(--bd)}
+.emk .emk-dlg canvas{border:1px solid var(--bd);margin:6px 0}
+.emk .emk-warnbox{background:#fff4e6;color:#d9480f;padding:8px 12px;border-radius:4px;margin:8px 0}
+.emk .emk-toast{background:#333;color:#fff;padding:10px 16px;border-radius:4px}

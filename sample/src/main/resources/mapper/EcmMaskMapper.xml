@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- Oracle 문법 기준 (H2 는 MODE=Oracle). EDMS 로 옮길 때 테이블/컬럼명만 실제 것으로 바꾼다 -->
+<mapper namespace="ecmMask">
+
+  <sql id="cols">
+    PROC_DATE, PROC_TIME, PROC_SEQ, BIZ_CD, FILE_SEQ, FILE_NM AS FILE_NAME, ENTITY_ID, DEL_YN,
+    ELEMENT_ID, MASK_YN, TO_CHAR(MASK_DT, 'YYYY/MM/DD HH24:MI:SS') AS MASK_DT, MASK_ORG_ELEMENT_ID
+  </sql>
+
+  <select id="selectEcmFileList" parameterType="hashmap" resultType="sample.ecmmask.EcmFileVO">
+    SELECT <include refid="cols"/>
+      FROM TB_ECM_FILE
+     WHERE 1 = 1
+    <if test="procDate != null and procDate != ''"> AND PROC_DATE = #{procDate} </if>
+    <if test="procSeq  != null and procSeq  != ''"> AND PROC_SEQ  = #{procSeq}  </if>
+    <if test="bizCd    != null and bizCd    != ''"> AND BIZ_CD    = #{bizCd}    </if>
+    <if test="fileSeq  != null and fileSeq  != ''"> AND FILE_SEQ  = #{fileSeq}  </if>
+    <if test="delYn    != null and delYn    != ''"> AND DEL_YN    = #{delYn}    </if>
+    <if test="maskYn   != null and maskYn   != ''"> AND MASK_YN   = #{maskYn}   </if>
+     ORDER BY PROC_DATE DESC, PROC_SEQ DESC, FILE_SEQ
+  </select>
+
+  <select id="selectEcmFile" parameterType="hashmap" resultType="sample.ecmmask.EcmFileVO">
+    SELECT <include refid="cols"/>
+      FROM TB_ECM_FILE
+     WHERE PROC_DATE = #{procDate}
+       AND PROC_SEQ  = #{procSeq}
+       AND FILE_SEQ  = #{fileSeq}
+  </select>
+
+  <!-- ELEMENT_ID = oldId 조건: 그 사이 다른 사람이 먼저 저장했으면 0건 → 서비스가 새 요소를 지운다 -->
+  <update id="updateMask" parameterType="hashmap">
+    UPDATE TB_ECM_FILE
+       SET ELEMENT_ID          = #{newId},
+           MASK_ORG_ELEMENT_ID = NVL(MASK_ORG_ELEMENT_ID, #{oldId}),
+           MASK_YN             = 'Y',
+           MASK_DT             = SYSDATE,
+           MASK_USER           = #{userId}
+     WHERE PROC_DATE  = #{procDate}
+       AND PROC_SEQ   = #{procSeq}
+       AND FILE_SEQ   = #{fileSeq}
+       AND ELEMENT_ID = #{oldId}
+  </update>
+
+  <!-- ===== 샘플 전용 ===== -->
+
+  <insert id="insertEcmFile" parameterType="sample.ecmmask.EcmFileVO">
+    INSERT INTO TB_ECM_FILE (PROC_DATE, PROC_TIME, PROC_SEQ, BIZ_CD, FILE_SEQ, FILE_NM, ENTITY_ID, DEL_YN, ELEMENT_ID)
+    VALUES (#{procDate}, #{procTime}, #{procSeq}, #{bizCd}, #{fileSeq}, #{fileName}, #{entityId}, #{delYn}, #{elementId})
+  </insert>
+
+  <select id="selectEcmFileCount" resultType="int">
+    SELECT COUNT(*) FROM TB_ECM_FILE
+  </select>
+
+  <select id="selectMenuList" resultType="hashmap">
+    SELECT MENU_ID, PARENT_ID, MENU_NM, MENU_URL
+      FROM TB_MENU
+     WHERE USE_YN = 'Y'
+     ORDER BY SORT_NO
+  </select>
+
+</mapper>
