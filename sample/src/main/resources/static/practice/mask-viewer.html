@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>마스킹 뷰어 (HTML 원본)</title>
+<!-- JSP 변환 연습용 원본. 서버 없이 가짜 문서로 동작한다.
+     이 파일을 /WEB-INF/views/practice/practiceMask.jsp 로 옮기는 것이 연습 과제다.
+     [변환 포인트 N] 주석이 JSP 에서 바꿔야 할 곳이다. -->
+<style>
+  body{margin:0;background:#f4f6fb}
+  .mv{display:flex;gap:16px;padding:16px;font:13px/1.4 "Malgun Gothic",Arial,sans-serif;color:#222}
+  .mv-list{width:280px;flex:none;border:1px solid #ccd;background:#fff;align-self:flex-start}
+  .mv-list h3{margin:0;padding:10px 12px;border-bottom:1px solid #ccd;font-size:14px}
+  .mv-item{padding:8px 12px;border-bottom:1px solid #eee;cursor:pointer}
+  .mv-item:hover,.mv-item.on{background:#eef2ff}
+  .mv-item small{color:#667}
+  .mv-main{flex:1;min-width:0}
+  .mv-tools{display:flex;gap:6px;align-items:center;margin-bottom:8px}
+  .mv-tools span{margin-left:8px;color:#556}
+  .mv-stage{border:1px solid #ccd;background:#888;overflow:auto;max-height:78vh}
+  .mv-stage canvas{display:block;max-width:100%;cursor:crosshair}
+</style>
+</head>
+<body>
+<div class="mv">
+  <div class="mv-list">
+    <h3>문서 목록</h3>
+    <div id="mvList"></div>
+  </div>
+  <div class="mv-main">
+    <div class="mv-tools">
+      <button type="button" id="mvUndo">되돌리기</button>
+      <button type="button" id="mvClear">모두 지우기</button>
+      <button type="button" id="mvDownload">PNG 저장</button>
+      <span id="mvMsg">왼쪽에서 문서를 고르세요.</span>
+    </div>
+    <div class="mv-stage"><canvas id="mvCanvas" width="600" height="400"></canvas></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // [변환 포인트 1] 목록 데이터 — JSP 에서는 컨트롤러가 넘긴 rows 로 바꾼다
+  var DOCS = [
+    { procDate: '20261103', procSeq: 15, fileSeq: 1, fileName: 'ECM_MOCK_00001_1.jpg', title: '종합소득세 신고서' },
+    { procDate: '20261103', procSeq: 15, fileSeq: 2, fileName: 'ECM_MOCK_00001_2.png', title: '주민등록표 등본' },
+    { procDate: '20261103', procSeq: 14, fileSeq: 1, fileName: 'ECM_MOCK_00002_1.jpg', title: '신분증 사본' }
+  ];
+
+  // [변환 포인트 2] 이미지 주소 — 지금은 가짜 문서를 그려 만든다. JSP 에서는 file.do 주소로 바꾼다
+  function imageUrl(doc) {
+    return mockImage(doc.title);
+  }
+
+  var list = document.getElementById('mvList');
+  var canvas = document.getElementById('mvCanvas');
+  var g = canvas.getContext('2d');
+  var cur = null, img = null, boxes = [], drag = null;
+
+  function msg(t) { document.getElementById('mvMsg').textContent = t; }
+
+  function renderList() {
+    var html = '';
+    DOCS.forEach(function (d, i) {
+      // [변환 포인트 3] 템플릿 리터럴의 ${...} 는 JSP 가 EL 로 먼저 해석한다
+      html += `<div class="mv-item" data-i="${i}">${d.fileName}<br><small>${d.procDate} / ${d.procSeq} / ${d.fileSeq}</small></div>`;
+    });
+    list.innerHTML = html;
+  }
+
+  function open(doc, el) {
+    var items = list.querySelectorAll('.mv-item');
+    for (var i = 0; i < items.length; i++) items[i].classList.toggle('on', items[i] === el);
+    var im = new Image();
+    im.onload = function () {
+      cur = doc; img = im; boxes = [];
+      canvas.width = im.naturalWidth;
+      canvas.height = im.naturalHeight;
+      draw();
+      msg(`${doc.fileName} — 드래그해서 가릴 영역을 지정하세요.`);
+    };
+    im.onerror = function () { msg('이미지를 읽을 수 없습니다: ' + doc.fileName); };
+    im.src = imageUrl(doc);
+  }
+
+  function draw() {
+    if (!img) return;
+    g.drawImage(img, 0, 0);
+    g.fillStyle = '#000';
+    boxes.forEach(function (b) { g.fillRect(b.x, b.y, b.w, b.h); });
+    if (drag) {
+      g.strokeStyle = '#e53935';
+      g.lineWidth = 2;
+      g.strokeRect(drag.x, drag.y, drag.w, drag.h);
+    }
+  }
+
+  // 화면에 줄여 보인 canvas 의 마우스 좌표 → 원본 픽셀 좌표
+  function pos(e) {
+    var r = canvas.getBoundingClientRect();
+    return { x: (e.clientX - r.left) * canvas.width / r.width, y: (e.clientY - r.top) * canvas.height / r.height };
+  }
+
+  list.onclick = function (e) {
+    var el = e.target.closest('.mv-item');
+    if (el) open(DOCS[el.getAttribute('data-i')], el);
+  };
+
+  canvas.onmousedown = function (e) {
+    if (!img) return;
+    var p = pos(e);
+    drag = { x: p.x, y: p.y, w: 0, h: 0, sx: p.x, sy: p.y };
+  };
+
+  window.addEventListener('mousemove', function (e) {
+    if (!drag) return;
+    var p = pos(e);
+    drag.x = Math.min(drag.sx, p.x); drag.y = Math.min(drag.sy, p.y);
+    drag.w = Math.abs(p.x - drag.sx); drag.h = Math.abs(p.y - drag.sy);
+    draw();
+  });
+
+  window.addEventListener('mouseup', function () {
+    if (!drag) return;
+    if (drag.w > 3 && drag.h > 3) boxes.push({ x: drag.x, y: drag.y, w: drag.w, h: drag.h });
+    drag = null;
+    draw();
+    msg(`가린 영역 ${boxes.length}개`);
+  });
+
+  document.getElementById('mvUndo').onclick = function () { boxes.pop(); draw(); };
+  document.getElementById('mvClear').onclick = function () { boxes = []; draw(); };
+  document.getElementById('mvDownload').onclick = function () {
+    if (!img) { msg('먼저 문서를 여세요.'); return; }
+    var a = document.createElement('a');
+    a.href = canvas.toDataURL('image/png');
+    a.download = cur.fileName.replace(/\.\w+$/, '') + '_masked.png';
+    a.click();
+  };
+
+  // 가짜 개인정보 문서 한 장 (모든 값은 가상)
+  function mockImage(title) {
+    var c = document.createElement('canvas'); c.width = 620; c.height = 877;
+    var x = c.getContext('2d');
+    x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height);
+    x.fillStyle = '#222'; x.font = 'bold 26px sans-serif'; x.fillText(title, 60, 90);
+    x.font = '17px sans-serif';
+    ['성명: 홍길동', '주민등록번호: 800101-1234567', '주소: 서울특별시 서초구 서초대로 000',
+     '전화번호: 010-1234-5678', '계좌번호: 123456-01-234567'].forEach(function (t, i) { x.fillText(t, 70, 170 + i * 42); });
+    x.strokeRect(50, 130, 520, 240);
+    x.font = '13px sans-serif'; x.fillText('※ 샘플 문서 — 모든 정보는 가상입니다.', 60, 830);
+    return c.toDataURL('image/png');
+  }
+
+  renderList();
+})();
+</script>
+</body>
+</html>

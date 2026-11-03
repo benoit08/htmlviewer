@@ -7,4 +7,5 @@ MERGE INTO TB_MENU KEY (MENU_ID) VALUES ('M500', NULL,   '시스템관리',     
 MERGE INTO TB_MENU KEY (MENU_ID) VALUES ('M600', NULL,   'ECM파일처리내역',      NULL,                 60, 'Y');
 MERGE INTO TB_MENU KEY (MENU_ID) VALUES ('M610', 'M600', 'ECM파일처리내역 조회', NULL,                 61, 'Y');
 MERGE INTO TB_MENU KEY (MENU_ID) VALUES ('M620', 'M600', 'ECM 문서 마스킹',      '/ecm/mask/view.do',  62, 'Y');
+MERGE INTO TB_MENU KEY (MENU_ID) VALUES ('M630', 'M600', 'JSP 변환 연습',        '/practice/view.do',  63, 'Y');
 MERGE INTO TB_MENU KEY (MENU_ID) VALUES ('M700', NULL,   '교부문서처리내역',     NULL,                 70, 'Y');
